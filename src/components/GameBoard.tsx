@@ -24,11 +24,13 @@ const GameBoard: React.FC<GameBoardProps> = ({ board, placeBlock }) => {
 
   const updateHighlightedCells = (block: Block, rowIndex: number, colIndex: number) => {
     const newHighlightedCells: { [key: string]: boolean } = {};
-    const canPlace = canPlaceBlock(board, block, rowIndex, colIndex);
+    const adjustedRowIndex = rowIndex - block.centerRow;
+    const adjustedColIndex = colIndex - block.centerCol;
+    const canPlace = canPlaceBlock(board, block, adjustedRowIndex, adjustedColIndex);
     for (let i = 0; i < block.shape.length; i++) {
       for (let j = 0; j < block.shape[i].length; j++) {
         if (block.shape[i][j]) {
-          const cellKey = `${rowIndex + i}-${colIndex + j}`;
+          const cellKey = `${adjustedRowIndex + i}-${adjustedColIndex + j}`;
           newHighlightedCells[cellKey] = canPlace;
         }
       }
@@ -77,12 +79,18 @@ interface CellProps {
 const Cell: React.FC<CellProps> = ({ cellValue, rowIndex, colIndex, board, placeBlock, getCellColor, isHighlighted, updateHighlightedCells, clearHighlightedCells }) => {
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: 'block',
-    drop: (item: Block) => {
-      placeBlock(item, rowIndex, colIndex);
+    drop: (item: Block & { centerRow: number; centerCol: number }) => {
+      const adjustedRowIndex = rowIndex - item.centerRow;
+      const adjustedColIndex = colIndex - item.centerCol;
+      placeBlock(item, adjustedRowIndex, adjustedColIndex);
       clearHighlightedCells();
     },
-    canDrop: (item: Block) => canPlaceBlock(board, item, rowIndex, colIndex),
-    hover: (item: Block) => {
+    canDrop: (item: Block & { centerRow: number; centerCol: number }) => {
+      const adjustedRowIndex = rowIndex - item.centerRow;
+      const adjustedColIndex = colIndex - item.centerCol;
+      return canPlaceBlock(board, item, adjustedRowIndex, adjustedColIndex);
+    },
+    hover: (item: Block & { centerRow: number; centerCol: number }) => {
       updateHighlightedCells(item, rowIndex, colIndex);
     },
     collect: (monitor) => ({

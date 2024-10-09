@@ -23,7 +23,11 @@ interface DraggableBlockProps {
 const DraggableBlock: React.FC<DraggableBlockProps> = ({ block }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'block',
-    item: block,
+    item: () => {
+      const centerRow = Math.floor(block.shape.length / 2);
+      const centerCol = Math.floor(block.shape[0].length / 2);
+      return { ...block, centerRow, centerCol };
+    },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
