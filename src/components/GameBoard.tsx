@@ -101,7 +101,7 @@ const Cell: React.FC<CellProps> = ({ cellValue, rowIndex, colIndex, board, place
 
   let backgroundColor = getCellColor(cellValue);
   if (isHighlighted) {
-    backgroundColor = 'bg-gray-400 border-1 border-gray-700';
+    backgroundColor = 'bg-gray-300 border-1 border-gray-700';
   }
 
   return (
