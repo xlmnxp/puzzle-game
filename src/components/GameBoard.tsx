@@ -101,6 +101,11 @@ const Cell: React.FC<CellProps> = ({
   });
 
   let backgroundColor = getCellColor(cellValue);
+  if (isOver) {
+    backgroundColor = canDrop ? 'bg-green-300' : 'bg-red-300';
+  } else if (isHighlighted) {
+    backgroundColor = canDrop ? 'bg-blue-200' : 'bg-red-200';
+  }
 
   return (
     <div
