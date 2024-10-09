@@ -2,7 +2,7 @@
   "name": "Block Puzzle",
   "short_name": "BlockPuzzle",
   "description": "A fun and challenging block puzzle game",
-  "start_url": "/puzzle-game/",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3b82f6",
