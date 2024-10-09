@@ -62,18 +62,20 @@ function App() {
       });
 
       // Check for completed rows and columns
-      const completedRows = newBoard.filter(row => row.every(cell => cell !== 0));
-      const completedCols = Array(10).fill(null).map((_, colIndex) => 
-        newBoard.every(row => row[colIndex] !== 0)
-      ).filter(Boolean);
+      const completedRows = newBoard.reduce((acc, row, index) => row.every(cell => cell !== 0) ? [...acc, index] : acc, []);
+      const completedCols = Array(10).fill(null).reduce((acc, _, colIndex) => 
+        newBoard.every(row => row[colIndex] !== 0) ? [...acc, colIndex] : acc, []);
 
       if (completedRows.length > 0 || completedCols.length > 0) {
         playRemoveSound();
         playEncouragementSound();
 
-        const updatedBoard = newBoard.map(row => row.map(cell => 
-          completedRows.includes(row) || completedCols.some((_, i) => completedCols[i] && row[i] !== 0) ? 0 : cell
-        ));
+        const updatedBoard = newBoard.map((row, rowIndex) => 
+          completedRows.includes(rowIndex) 
+            ? Array(10).fill(0) 
+            : row.map((cell, colIndex) => completedCols.includes(colIndex) ? 0 : cell)
+        );
+
         setBoard(updatedBoard);
         const clearedCells = (completedRows.length * 10) + (completedCols.length * 10) - (completedRows.length * completedCols.length);
         setScore(prevScore => prevScore + clearedCells);
