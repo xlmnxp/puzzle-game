@@ -1,7 +1,7 @@
 {
-  "name": "Block Puzzle",
-  "short_name": "BlockPuzzle",
-  "description": "A fun and challenging block puzzle game",
+  "name": "لعبة المكعبات",
+  "short_name": "لعبة المكعبات",
+  "description": "لعبة ألغاز المكعبات الممتعة والصعبة",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
