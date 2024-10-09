@@ -50,9 +50,9 @@ const BlockSelector: React.FC<BlockSelectorProps> = ({ blocks, setDraggedBlock }
 
   return (
     <div className="flex justify-center space-x-4 bg-transparent">
-      {blocks.map((block, index) => (
+      {blocks.map((block) => (
         <div
-          key={index}
+          key={block.id}
           className="cursor-move touch-manipulation"
           draggable
           onDragStart={(e) => handleDragStart(e, block)}

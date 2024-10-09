@@ -55,17 +55,7 @@ function App() {
       setBoard(newBoard);
       setScore(prevScore => prevScore + block.shape.flat().filter(Boolean).length);
       setAvailableBlocks(prevBlocks => {
-        const updatedBlocks = prevBlocks.filter(b => {
-          if (b.color !== block.color) return true;
-          if (b.shape.length !== block.shape.length) return true;
-          for (let i = 0; i < b.shape.length; i++) {
-            if (b.shape[i].length !== block.shape[i].length) return true;
-            for (let j = 0; j < b.shape[i].length; j++) {
-              if (b.shape[i][j] !== block.shape[i][j]) return true;
-            }
-          }
-          return false;
-        });
+        const updatedBlocks = prevBlocks.filter(b => b.id !== block.id);
         return updatedBlocks.concat(generateBlocks(1));
       });
       setDraggedBlock(null);

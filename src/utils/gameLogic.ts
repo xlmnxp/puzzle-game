@@ -23,9 +23,15 @@ const shuffleArray = <T>(array: T[]): T[] => {
   return array;
 };
 
+// Simple unique ID generator
+const generateUniqueId = (): string => {
+  return Math.random().toString(36).substr(2, 9);
+};
+
 export const generateBlocks = (count: number = 3): Block[] => {
   const shuffledShapes = shuffleArray([...blockShapes]);
   return shuffledShapes.slice(0, count).map(shape => ({
+    id: generateUniqueId(),
     shape,
     color: Math.floor(Math.random() * 5) + 1, // Random color from 1 to 5
   }));
