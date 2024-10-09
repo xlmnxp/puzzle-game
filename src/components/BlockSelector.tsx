@@ -8,7 +8,7 @@ interface BlockSelectorProps {
 
 const BlockSelector: React.FC<BlockSelectorProps> = ({ blocks }) => {
   return (
-    <div className="flex justify-center space-x-4 bg-transparent">
+    <div className="flex flex-row-reverse justify-center space-x-4 bg-transparent">
       {blocks.map((block) => (
         <DraggableBlock key={block.id} block={block} />
       ))}
