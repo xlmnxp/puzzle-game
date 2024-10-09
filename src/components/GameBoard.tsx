@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDrop } from 'react-dnd';
 import { Block } from '../types';
 import { canPlaceBlock } from '../utils/gameLogic';
@@ -9,6 +9,8 @@ interface GameBoardProps {
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({ board, placeBlock }) => {
+  const [highlightedCells, setHighlightedCells] = useState<{ [key: string]: boolean }>({});
+
   const getCellColor = (cellValue: number) => {
     switch (cellValue) {
       case 1: return 'bg-red-500';
@@ -18,6 +20,23 @@ const GameBoard: React.FC<GameBoardProps> = ({ board, placeBlock }) => {
       case 5: return 'bg-purple-500';
       default: return 'bg-gray-200';
     }
+  };
+
+  const updateHighlightedCells = (block: Block, rowIndex: number, colIndex: number) => {
+    const newHighlightedCells: { [key: string]: boolean } = {};
+    for (let i = 0; i < block.shape.length; i++) {
+      for (let j = 0; j < block.shape[i].length; j++) {
+        if (block.shape[i][j]) {
+          const cellKey = `${rowIndex + i}-${colIndex + j}`;
+          newHighlightedCells[cellKey] = canPlaceBlock(board, block, rowIndex, colIndex);
+        }
+      }
+    }
+    setHighlightedCells(newHighlightedCells);
+  };
+
+  const clearHighlightedCells = () => {
+    setHighlightedCells({});
   };
 
   return (
@@ -32,6 +51,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ board, placeBlock }) => {
             board={board}
             placeBlock={placeBlock}
             getCellColor={getCellColor}
+            isHighlighted={highlightedCells[`${rowIndex}-${colIndex}`]}
+            updateHighlightedCells={updateHighlightedCells}
+            clearHighlightedCells={clearHighlightedCells}
           />
         ))
       )}
@@ -46,15 +68,32 @@ interface CellProps {
   board: number[][];
   placeBlock: (block: Block, rowIndex: number, colIndex: number) => void;
   getCellColor: (cellValue: number) => string;
+  isHighlighted: boolean;
+  updateHighlightedCells: (block: Block, rowIndex: number, colIndex: number) => void;
+  clearHighlightedCells: () => void;
 }
 
-const Cell: React.FC<CellProps> = ({ cellValue, rowIndex, colIndex, board, placeBlock, getCellColor }) => {
+const Cell: React.FC<CellProps> = ({
+  cellValue,
+  rowIndex,
+  colIndex,
+  board,
+  placeBlock,
+  getCellColor,
+  isHighlighted,
+  updateHighlightedCells,
+  clearHighlightedCells,
+}) => {
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: 'block',
     drop: (item: Block) => {
       placeBlock(item, rowIndex, colIndex);
+      clearHighlightedCells();
     },
     canDrop: (item: Block) => canPlaceBlock(board, item, rowIndex, colIndex),
+    hover: (item: Block) => {
+      updateHighlightedCells(item, rowIndex, colIndex);
+    },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
       canDrop: !!monitor.canDrop(),
@@ -62,9 +101,6 @@ const Cell: React.FC<CellProps> = ({ cellValue, rowIndex, colIndex, board, place
   });
 
   let backgroundColor = getCellColor(cellValue);
-  if (isOver) {
-    backgroundColor = canDrop ? 'bg-green-300' : 'bg-red-300';
-  }
 
   return (
     <div
