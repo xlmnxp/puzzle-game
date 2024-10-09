@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Grid, Crown } from 'lucide-react';
+import { DndProvider } from 'react-dnd';
+import { TouchBackend } from 'react-dnd-touch-backend';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import GameBoard from './components/GameBoard';
 import BlockSelector from './components/BlockSelector';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
@@ -12,7 +15,6 @@ function App() {
   const [score, setScore] = useState<number>(0);
   const [highestScore, setHighestScore] = useState<number>(0);
   const [availableBlocks, setAvailableBlocks] = useState<Block[]>([]);
-  const [draggedBlock, setDraggedBlock] = useState<Block | null>(null);
   const [gameOver, setGameOver] = useState<boolean>(false);
   const highScorePlayedRef = useRef<boolean>(false);
 
@@ -58,7 +60,6 @@ function App() {
         const updatedBlocks = prevBlocks.filter(b => b.id !== block.id);
         return updatedBlocks.concat(generateBlocks(1));
       });
-      setDraggedBlock(null);
 
       // Check for completed rows and columns
       const completedRows = newBoard.filter(row => row.every(cell => cell !== 0));
@@ -88,44 +89,47 @@ function App() {
     setBoard(Array(10).fill(null).map(() => Array(10).fill(0)));
     setScore(0);
     setAvailableBlocks(generateBlocks());
-    setDraggedBlock(null);
     setGameOver(false);
     highScorePlayedRef.current = false;
   };
 
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-      <h1 className="text-4xl font-bold mb-4 text-blue-600">Block Puzzle</h1>
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex flex-col items-start">
-            <div className="flex items-center">
-              <Grid className="w-6 h-6 mr-2 text-blue-500" />
-              <span className="text-xl font-semibold">Score: {score}</span>
+    <DndProvider backend={isTouchDevice ? TouchBackend : HTML5Backend}>
+      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+        <h1 className="text-4xl font-bold mb-4 text-blue-600">Block Puzzle</h1>
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col items-start">
+              <div className="flex items-center">
+                <Grid className="w-6 h-6 mr-2 text-blue-500" />
+                <span className="text-xl font-semibold">Score: {score}</span>
+              </div>
+              <div className="flex items-center mt-1">
+                <Crown className="w-5 h-5 mr-2 text-yellow-500" />
+                <span className="text-lg font-semibold">Best: {highestScore}</span>
+              </div>
             </div>
-            <div className="flex items-center mt-1">
-              <Crown className="w-5 h-5 mr-2 text-yellow-500" />
-              <span className="text-lg font-semibold">Best: {highestScore}</span>
-            </div>
+            <button
+              onClick={resetGame}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+            >
+              New Game
+            </button>
           </div>
-          <button
-            onClick={resetGame}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-          >
-            New Game
-          </button>
+          <GameBoard board={board} placeBlock={placeBlock} />
+          <BlockSelector blocks={availableBlocks} />
+          {gameOver && (
+            <div className="mt-4 text-center">
+              <p className="text-xl font-bold text-red-600">Game Over!</p>
+              <p className="text-lg">Final Score: {score}</p>
+            </div>
+          )}
         </div>
-        <GameBoard board={board} placeBlock={placeBlock} draggedBlock={draggedBlock} />
-        <BlockSelector blocks={availableBlocks} setDraggedBlock={setDraggedBlock} />
-        {gameOver && (
-          <div className="mt-4 text-center">
-            <p className="text-xl font-bold text-red-600">Game Over!</p>
-            <p className="text-lg">Final Score: {score}</p>
-          </div>
-        )}
+        <PWAInstallPrompt />
       </div>
-      <PWAInstallPrompt />
-    </div>
+    </DndProvider>
   );
 }
 
