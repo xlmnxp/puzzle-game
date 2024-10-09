@@ -33,12 +33,12 @@ const PWAInstallPrompt: React.FC = () => {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 bg-blue-100 p-4 rounded-lg shadow-lg flex items-center justify-between">
-      <p className="text-blue-800 font-semibold">Install Block Puzzle for a better experience!</p>
+      <p className="text-blue-800 font-semibold">قم بتثبيت لعبة المكعبات للحصول على تجربة أفضل!</p>
       <button
         onClick={handleInstall}
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
       >
-        Install
+        تثبيت
       </button>
     </div>
   );
