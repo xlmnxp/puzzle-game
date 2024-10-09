@@ -10,26 +10,15 @@ const BlockSelector: React.FC<BlockSelectorProps> = ({ blocks, setDraggedBlock }
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, block: Block) => {
     e.dataTransfer.setData('application/json', JSON.stringify(block));
     setDraggedBlock(block);
-
-    // Create a custom drag image
-    const dragImage = e.currentTarget.cloneNode(true) as HTMLElement;
-    dragImage.style.position = 'absolute';
-    dragImage.style.top = '-1000px';
-    dragImage.style.opacity = '0.7';
-    document.body.appendChild(dragImage);
-    e.dataTransfer.setDragImage(dragImage, 0, 0);
-
-    // Remove the drag image after the drag operation
-    setTimeout(() => {
-      document.body.removeChild(dragImage);
-    }, 0);
   };
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>, block: Block) => {
+    e.preventDefault();
     setDraggedBlock(block);
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.preventDefault();
     setDraggedBlock(null);
   };
 
