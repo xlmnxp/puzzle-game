@@ -42,7 +42,16 @@ export const canPlaceBlock = (board: number[][], block: Block, rowIndex: number,
   for (let i = 0; i < block.shape.length; i++) {
     for (let j = 0; j < block.shape[i].length; j++) {
       if (block.shape[i][j]) {
-        if (rowIndex + i >= board.length || colIndex + j >= board[0].length || board[rowIndex + i][colIndex + j] !== 0) {
+        const boardRow = rowIndex + i;
+        const boardCol = colIndex + j;
+        
+        // Check if the block is within the board boundaries
+        if (boardRow < 0 || boardRow >= board.length || boardCol < 0 || boardCol >= board[0].length) {
+          return false;
+        }
+        
+        // Check if the cell is already occupied
+        if (board[boardRow][boardCol] !== 0) {
           return false;
         }
       }
