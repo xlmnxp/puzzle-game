@@ -13,7 +13,7 @@ const AdSense: React.FC = () => {
     <div className="w-full bg-gray-100 py-2 text-center">
       <ins
         className="adsbygoogle"
-        style={{ display: 'responsive' }}
+        style={{ display: 'block' }}
         data-ad-client="ca-pub-1605296800226956" // Replace with your actual AdSense publisher ID
         data-ad-slot="5055309384" // Replace with your actual ad slot ID
         data-ad-format="auto"
