@@ -6,6 +6,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import GameBoard from './components/GameBoard';
 import BlockSelector from './components/BlockSelector';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
+import AdSense from './components/AdSense';
 import { generateBlocks, checkGameOver, canPlaceBlock } from './utils/gameLogic';
 import { playPlaceSound, playRemoveSound, playEncouragementSound, playHighScoreSound } from './utils/sounds';
 import { Block } from './types';
@@ -99,35 +100,40 @@ function App() {
 
   return (
     <DndProvider backend={isTouchDevice ? TouchBackend : HTML5Backend}>
-      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-        <h1 className="text-4xl font-bold mb-4 text-blue-600">لعبة المكعبات</h1>
-        <div className="p-6 rounded-lg">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex flex-col items-start">
-              <div className="flex items-center">
-                <Grid className="w-6 h-6 ml-2 text-blue-500" />
-                <span className="text-xl font-semibold">النقاط: {score}</span>
+      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-start">
+        <div className="sticky top-0 w-full z-10">
+          <AdSense />
+        </div>
+        <div className="p-4 w-full max-w-3xl">
+          <h1 className="text-4xl font-bold mb-4 text-blue-600 text-center">لعبة المكعبات</h1>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex flex-col items-start">
+                <div className="flex items-center">
+                  <Grid className="w-6 h-6 ml-2 text-blue-500" />
+                  <span className="text-xl font-semibold">النقاط: {score}</span>
+                </div>
+                <div className="flex items-center mt-1">
+                  <Crown className="w-5 h-5 ml-2 text-yellow-500" />
+                  <span className="text-lg font-semibold">الأفضل: {highestScore}</span>
+                </div>
               </div>
-              <div className="flex items-center mt-1">
-                <Crown className="w-5 h-5 ml-2 text-yellow-500" />
-                <span className="text-lg font-semibold">الأفضل: {highestScore}</span>
-              </div>
+              <button
+                onClick={resetGame}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+              >
+                بدء لعبة جديدة
+              </button>
             </div>
-            <button
-              onClick={resetGame}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-            >
-              بدء لعبة جديدة
-            </button>
+            <GameBoard board={board} placeBlock={placeBlock} />
+            <BlockSelector blocks={availableBlocks} />
+            {gameOver && (
+              <div className="mt-4 text-center">
+                <p className="text-xl font-bold text-red-600">انتهت اللعبة!</p>
+                <p className="text-lg">افضل نتيجة لك: {score}</p>
+              </div>
+            )}
           </div>
-          <GameBoard board={board} placeBlock={placeBlock} />
-          <BlockSelector blocks={availableBlocks} />
-          {gameOver && (
-            <div className="mt-4 text-center">
-              <p className="text-xl font-bold text-red-600">انتهت اللعبة!</p>
-              <p className="text-lg">افضل نتيجة لك: {score}</p>
-            </div>
-          )}
         </div>
         <PWAInstallPrompt />
       </div>
