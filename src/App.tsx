@@ -82,7 +82,7 @@ function App() {
         setScore(prevScore => prevScore + clearedCells);
       }
 
-      if (checkGameOver(newBoard, availableBlocks)) {
+      if (checkGameOver(board, availableBlocks)) {
         setGameOver(true);
       }
     }
