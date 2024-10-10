@@ -16,7 +16,6 @@ const AdSense: React.FC = () => {
         style={{ display: 'block', minWidth: '250px', maxWidth: '728px', width: '100%', height: '90px' }}
         data-ad-client="ca-pub-1605296800226956" // Replace with your actual AdSense publisher ID
         data-ad-slot="5055309384" // Replace with your actual ad slot ID
-        data-ad-format="auto"
         data-full-width-responsive="true"
       ></ins>
     </div>

@@ -101,7 +101,7 @@ function App() {
   return (
     <DndProvider backend={isTouchDevice ? TouchBackend : HTML5Backend}>
       <div className="min-h-screen bg-gray-100 flex flex-col items-center">
-        <div className="w-full">
+        <div className="w-full text-center">
           <AdSense />
         </div>
         <div className="p-4 w-full max-w-3xl flex-grow">
