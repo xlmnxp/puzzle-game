@@ -41,7 +41,7 @@ function App() {
   const placeBlock = (block: Block, rowIndex: number, colIndex: number) => {
     if (gameOver) return;
 
-    const newBoard = board.map(row => [...row]);
+    let newBoard = board.map(row => [...row]);
     let canPlace = canPlaceBlock(newBoard, block, rowIndex, colIndex);
 
     if (canPlace) {
@@ -71,18 +71,18 @@ function App() {
         playRemoveSound();
         playEncouragementSound();
 
-        const updatedBoard = newBoard.map((row, rowIndex) => 
+        newBoard = newBoard.map((row, rowIndex) => 
           completedRows.includes(rowIndex) 
             ? Array(10).fill(0) 
             : row.map((cell, colIndex) => completedCols.includes(colIndex) ? 0 : cell)
         );
 
-        setBoard(updatedBoard);
+        setBoard(newBoard);
         const clearedCells = (completedRows.length * 10) + (completedCols.length * 10) - (completedRows.length * completedCols.length);
         setScore(prevScore => prevScore + clearedCells);
       }
 
-      if (checkGameOver(board, availableBlocks)) {
+      if (checkGameOver(newBoard, availableBlocks)) {
         setGameOver(true);
       }
     }
