@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
-    @apply bg-gray-100;
+html,
+body,
+#root {
+    @apply h-full w-full overflow-hidden;
+}
+
+body {
+    @apply bg-gray-100 touch-none select-none;
+    overscroll-behavior: none;
+}
+
+#root {
+    @apply flex flex-col;
 }
