@@ -102,7 +102,7 @@ function App() {
 
   return (
     <DndProvider backend={isTouchDevice ? TouchBackend : HTML5Backend}>
-      <div className="bg-gray-100 flex flex-col items-center">
+      <div className="flex flex-col items-center">
         <div className="p-4 w-full max-w-3xl flex-grow">
           <h1 className="text-4xl font-bold mb-4 text-blue-600 text-center">لعبة المكعبات</h1>
           <div className="p-4 sm:p-6">
