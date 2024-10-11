@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Grid, Crown } from 'lucide-react';
+import { Grid, Crown, RotateCcw } from 'lucide-react';
 import { DndProvider } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -107,7 +107,7 @@ function App() {
 
   return (
     <DndProvider backend={isTouchDevice ? TouchBackend : HTML5Backend}>
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center min-h-screen">
         <div className="p-4 w-full max-w-3xl flex-grow">
           <h1 className="text-4xl font-bold mb-4 text-blue-600 text-center">لعبة المكعبات</h1>
           <div className="p-4 sm:p-6">
@@ -124,23 +124,33 @@ function App() {
               </div>
               <button
                 onClick={resetGame}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors flex items-center"
               >
+                <RotateCcw className="w-5 h-5 ml-2" />
                 لعبة جديدة
               </button>
             </div>
             <GameBoard board={board} placeBlock={placeBlock} />
             <BlockSelector blocks={availableBlocks} />
-            {gameOver && (
-              <div className="mt-4 text-center">
-                <p className="text-xl font-bold text-red-600">انتهت اللعبة!</p>
-                <p className="text-lg">افضل نتيجة لك: {score}</p>
-              </div>
-            )}
           </div>
         </div>
         <PWAInstallPrompt />
       </div>
+      {gameOver && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-md">
+          <div className="bg-white p-8 rounded-lg shadow-lg text-center">
+            <h2 className="text-3xl font-bold text-red-600 mb-4">انتهت اللعبة!</h2>
+            <p className="text-2xl mb-6">النتيجة النهائية: {score}</p>
+            <button
+              onClick={resetGame}
+              className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center mx-auto text-xl"
+            >
+              <RotateCcw className="w-6 h-6 ml-2" />
+              لعب مرة أخرى
+            </button>
+          </div>
+        </div>
+      )}
     </DndProvider>
   );
 }
