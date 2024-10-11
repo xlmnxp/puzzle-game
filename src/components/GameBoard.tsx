@@ -101,13 +101,13 @@ const Cell: React.FC<CellProps> = ({ cellValue, rowIndex, colIndex, board, place
 
   let backgroundColor = getCellColor(cellValue);
   if (isHighlighted) {
-    backgroundColor = 'bg-gray-300 border-1 border-gray-700';
+    backgroundColor = 'bg-gray-300';
   }
 
   return (
     <div
       ref={drop}
-      className={`aspect-square border ${backgroundColor} ${isOver ? 'border-2' : ''}`}
+      className={`aspect-square border ${backgroundColor}`}
     />
   );
 };

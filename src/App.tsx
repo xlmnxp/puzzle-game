@@ -6,7 +6,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import GameBoard from './components/GameBoard';
 import BlockSelector from './components/BlockSelector';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
-import AdSense from './components/AdSense';
 import { generateBlocks, checkGameOver, canPlaceBlock } from './utils/gameLogic';
 import { playPlaceSound, playRemoveSound, playEncouragementSound, playHighScoreSound } from './utils/sounds';
 import { Block } from './types';
@@ -82,7 +81,10 @@ function App() {
         setScore(prevScore => prevScore + clearedCells);
       }
 
-      if (checkGameOver(newBoard, availableBlocks)) {
+      const updatedAvailableBlocks = availableBlocks.filter(b => b.id !== block.id).concat(generateBlocks(1));
+      setAvailableBlocks(updatedAvailableBlocks);
+
+      if (checkGameOver(newBoard, updatedAvailableBlocks)) {
         setGameOver(true);
       }
     }
