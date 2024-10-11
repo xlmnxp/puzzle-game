@@ -81,7 +81,12 @@ function App() {
         setScore(prevScore => prevScore + clearedCells);
       }
 
-      const updatedAvailableBlocks = availableBlocks.filter(b => b.id !== block.id).concat(generateBlocks(1));
+      let updatedAvailableBlocks = availableBlocks.filter(b => b.id !== block.id);
+
+      if (!updatedAvailableBlocks.length) {
+        updatedAvailableBlocks = generateBlocks(3)
+      }
+
       setAvailableBlocks(updatedAvailableBlocks);
 
       if (checkGameOver(newBoard, updatedAvailableBlocks)) {
