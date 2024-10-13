@@ -43,7 +43,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ board, placeBlock }) => {
   };
 
   return (
-    <div className="grid grid-cols-10 gap-0.5 mb-4">
+    <div className="grid grid-cols-8 gap-0.5 mb-4">
       {board.map((row, rowIndex) =>
         row.map((cell, colIndex) => (
           <Cell
