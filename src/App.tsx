@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Grid, Crown, RotateCcw } from 'lucide-react';
+import { Grid, Crown, RotateCcw, Info } from 'lucide-react';
 import { DndProvider } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -9,6 +9,7 @@ import PWAInstallPrompt from './components/PWAInstallPrompt';
 import { generateBlocks, checkGameOver, canPlaceBlock } from './utils/gameLogic';
 import { playPlaceSound, playRemoveSound, playEncouragementSound, playHighScoreSound } from './utils/sounds';
 import { Block } from './types';
+import Instructions from './components/Instructions';
 
 function App() {
   const [board, setBoard] = useState<number[][]>(Array(10).fill(null).map(() => Array(10).fill(0)));
@@ -16,6 +17,7 @@ function App() {
   const [highestScore, setHighestScore] = useState<number>(0);
   const [availableBlocks, setAvailableBlocks] = useState<Block[]>([]);
   const [gameOver, setGameOver] = useState<boolean>(false);
+  const [showInstructions, setShowInstructions] = useState<boolean>(false);
   const highScorePlayedRef = useRef<boolean>(false);
 
   useEffect(() => {
@@ -122,6 +124,14 @@ function App() {
                   <span className="text-lg font-semibold">الأفضل: {highestScore}</span>
                 </div>
               </div>
+
+              <button
+                onClick={() => setShowInstructions(!showInstructions)}
+                className="bg-blue-100 text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-200 transition-colors ml-2 flex items-center"
+              >
+                <Info className="w-5 h-5 ml-1" />
+                كيف العب؟
+              </button>
               <button
                 onClick={resetGame}
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors flex items-center"
@@ -130,8 +140,9 @@ function App() {
                 لعبة جديدة
               </button>
             </div>
-            <GameBoard board={board} placeBlock={placeBlock} />
-            <BlockSelector blocks={availableBlocks} />
+            {showInstructions && <Instructions />}
+            {!showInstructions && <GameBoard board={board} placeBlock={placeBlock} />}
+            {!showInstructions && <BlockSelector blocks={availableBlocks} />}
           </div>
         </div>
         <PWAInstallPrompt />
