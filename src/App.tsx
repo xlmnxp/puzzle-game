@@ -113,32 +113,33 @@ function App() {
         <div className="p-4 w-full max-w-3xl flex-grow">
           <h1 className="text-4xl font-bold mb-4 text-blue-600 text-center">لعبة المكعبات</h1>
           <div className="p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row items-center justify-between mb-4">
-              <div className="flex flex-col items-center sm:items-start mb-2 sm:mb-0">
-                <div className="flex items-center">
-                  <Grid className="w-6 h-6 ml-2 text-blue-500" />
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center ml-2">
+                  <Grid className="w-6 h-6 ml-1 text-blue-500" />
                   <span className="text-xl font-semibold">النقاط: {score}</span>
                 </div>
-                <div className="flex items-center mt-1">
-                  <Crown className="w-5 h-5 ml-2 text-yellow-500" />
+                <div className="flex items-center">
+                  <Crown className="w-5 h-5 ml-1 text-yellow-500" />
                   <span className="text-lg font-semibold">الأفضل: {highestScore}</span>
                 </div>
               </div>
-
-              <button
-                onClick={() => setShowInstructions(!showInstructions)}
-                className="bg-blue-100 text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-200 transition-colors ml-2 flex items-center"
-              >
-                <Info className="w-5 h-5 ml-1" />
-                كيف العب؟
-              </button>
-              <button
-                onClick={resetGame}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors flex items-center"
-              >
-                <RotateCcw className="w-5 h-5 ml-2" />
-                لعبة جديدة
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setShowInstructions(!showInstructions)}
+                  className="bg-blue-100 text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-200 transition-colors flex items-center ml-1"
+                >
+                  <Info className="w-5 h-5 ml-1" />
+                  كيف العب؟
+                </button>
+                <button
+                  onClick={resetGame}
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors flex items-center"
+                >
+                  <RotateCcw className="w-5 h-5 ml-1" />
+                  لعبة جديدة
+                </button>
+              </div>
             </div>
             {showInstructions && <Instructions />}
             {!showInstructions && <GameBoard board={board} placeBlock={placeBlock} />}
