@@ -18,6 +18,7 @@ function App() {
   const [availableBlocks, setAvailableBlocks] = useState<Block[]>([]);
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [showInstructions, setShowInstructions] = useState<boolean>(false);
+  const [showResetConfirmation, setShowResetConfirmation] = useState<boolean>(false);
   const highScorePlayedRef = useRef<boolean>(false);
 
   useEffect(() => {
@@ -103,6 +104,11 @@ function App() {
     setAvailableBlocks(generateBlocks());
     setGameOver(false);
     highScorePlayedRef.current = false;
+    setShowResetConfirmation(false);
+  };
+
+  const handleResetClick = () => {
+    setShowResetConfirmation(true);
   };
 
   const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -133,7 +139,7 @@ function App() {
                   كيف العب؟
                 </button>
                 <button
-                  onClick={resetGame}
+                  onClick={handleResetClick}
                   className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors flex items-center"
                 >
                   <RotateCcw className="w-5 h-5 ml-1" />
@@ -160,6 +166,28 @@ function App() {
               <RotateCcw className="w-6 h-6 ml-2" />
               لعب مرة أخرى
             </button>
+          </div>
+        </div>
+      )}
+      {showResetConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-md">
+          <div className="bg-white p-8 rounded-lg shadow-lg text-center">
+            <h2 className="text-2xl font-bold text-blue-600 mb-4">هل أنت متأكد؟</h2>
+            <p className="text-lg mb-6">هل تريد حقًا بدء لعبة جديدة؟ ستفقد تقدمك الحالي.</p>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={resetGame}
+                className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors ml-2"
+              >
+                نعم، ابدأ لعبة جديدة
+              </button>
+              <button
+                onClick={() => setShowResetConfirmation(false)}
+                className="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors"
+              >
+                لا، استمر في اللعبة الحالية
+              </button>
+            </div>
           </div>
         </div>
       )}
