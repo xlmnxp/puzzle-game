@@ -116,33 +116,33 @@ function App() {
   return (
     <DndProvider backend={isTouchDevice ? TouchBackend : HTML5Backend}>
       <div className="flex flex-col items-center min-h-screen">
-        <div className="p-4 w-full max-w-3xl flex-grow">
-          <h1 className="text-4xl font-bold mb-4 text-blue-600 text-center">لعبة المكعبات</h1>
-          <div className="p-4 sm:p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center ml-2">
-                  <Grid className="w-6 h-6 ml-1 text-blue-500" />
-                  <span className="text-xl font-semibold">النقاط: {score}</span>
+        <div className="p-2 w-full max-w-3xl flex-grow">
+          <h1 className="text-3xl font-bold mb-2 text-blue-600 text-center">لعبة المكعبات</h1>
+          <div className="p-2 sm:p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center ml-1">
+                  <Grid className="w-4 h-4 ml-1 text-blue-500" />
+                  <span className="text-sm font-semibold">النقاط: {score}</span>
                 </div>
                 <div className="flex items-center">
-                  <Crown className="w-5 h-5 ml-1 text-yellow-500" />
-                  <span className="text-lg font-semibold">الأفضل: {highestScore}</span>
+                  <Crown className="w-4 h-4 ml-1 text-yellow-500" />
+                  <span className="text-sm font-semibold">الأفضل: {highestScore}</span>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
                 <button
                   onClick={() => setShowInstructions(!showInstructions)}
-                  className="bg-blue-100 text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-200 transition-colors flex items-center ml-1"
+                  className="bg-blue-100 text-blue-600 px-2 py-1 rounded-lg hover:bg-blue-200 transition-colors flex items-center text-xs ml-1"
                 >
-                  <Info className="w-5 h-5 ml-1" />
+                  <Info className="w-4 h-4 ml-1" />
                   كيف العب؟
                 </button>
                 <button
                   onClick={handleResetClick}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors flex items-center"
+                  className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition-colors flex items-center text-xs"
                 >
-                  <RotateCcw className="w-5 h-5 ml-1" />
+                  <RotateCcw className="w-4 h-4 ml-1" />
                   لعبة جديدة
                 </button>
               </div>
@@ -156,14 +156,14 @@ function App() {
       </div>
       {gameOver && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-md">
-          <div className="bg-white p-8 rounded-lg shadow-lg text-center">
-            <h2 className="text-3xl font-bold text-red-600 mb-4">انتهت اللعبة!</h2>
-            <p className="text-2xl mb-6">النتيجة النهائية: {score}</p>
+          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+            <h2 className="text-2xl font-bold text-red-600 mb-3">انتهت اللعبة!</h2>
+            <p className="text-xl mb-4">النتيجة النهائية: {score}</p>
             <button
               onClick={resetGame}
-              className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center mx-auto text-xl"
+              className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center mx-auto text-lg"
             >
-              <RotateCcw className="w-6 h-6 ml-2" />
+              <RotateCcw className="w-5 h-5 ml-2" />
               لعب مرة أخرى
             </button>
           </div>
@@ -171,19 +171,19 @@ function App() {
       )}
       {showResetConfirmation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-md">
-          <div className="bg-white p-8 rounded-lg shadow-lg text-center">
-            <h2 className="text-2xl font-bold text-blue-600 mb-4">هل أنت متأكد؟</h2>
-            <p className="text-lg mb-6">هل تريد حقًا بدء لعبة جديدة؟ ستفقد تقدمك الحالي.</p>
-            <div className="flex justify-center space-x-4">
+          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+            <h2 className="text-xl font-bold text-blue-600 mb-3">هل أنت متأكد؟</h2>
+            <p className="text-sm mb-4">هل تريد حقًا بدء لعبة جديدة؟ ستفقد تقدمك الحالي.</p>
+            <div className="flex justify-center space-x-2">
               <button
                 onClick={resetGame}
-                className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors ml-2"
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm ml-2"
               >
                 نعم، ابدأ لعبة جديدة
               </button>
               <button
                 onClick={() => setShowResetConfirmation(false)}
-                className="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors"
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors text-sm"
               >
                 لا، استمر في اللعبة الحالية
               </button>
