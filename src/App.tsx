@@ -12,7 +12,7 @@ import { Block } from './types';
 import Instructions from './components/Instructions';
 
 function App() {
-  const [board, setBoard] = useState<number[][]>(Array(10).fill(null).map(() => Array(10).fill(0)));
+  const [board, setBoard] = useState<number[][]>(Array(8).fill(null).map(() => Array(8).fill(0)));
   const [score, setScore] = useState<number>(0);
   const [highestScore, setHighestScore] = useState<number>(0);
   const [availableBlocks, setAvailableBlocks] = useState<Block[]>([]);
@@ -66,7 +66,7 @@ function App() {
 
       // Check for completed rows and columns
       const completedRows = newBoard.reduce((acc, row, index) => row.every(cell => cell !== 0) ? [...acc, index] : acc, []);
-      const completedCols = Array(10).fill(null).reduce((acc, _, colIndex) => 
+      const completedCols = Array(8).fill(null).reduce((acc, _, colIndex) => 
         newBoard.every(row => row[colIndex] !== 0) ? [...acc, colIndex] : acc, []);
 
       if (completedRows.length > 0 || completedCols.length > 0) {
@@ -75,12 +75,12 @@ function App() {
 
         newBoard = newBoard.map((row, rowIndex) => 
           completedRows.includes(rowIndex) 
-            ? Array(10).fill(0) 
+            ? Array(8).fill(0) 
             : row.map((cell, colIndex) => completedCols.includes(colIndex) ? 0 : cell)
         );
 
         setBoard(newBoard);
-        const clearedCells = (completedRows.length * 10) + (completedCols.length * 10) - (completedRows.length * completedCols.length);
+        const clearedCells = (completedRows.length * 8) + (completedCols.length * 8) - (completedRows.length * completedCols.length);
         setScore(prevScore => prevScore + clearedCells);
       }
 
@@ -99,7 +99,7 @@ function App() {
   };
 
   const resetGame = () => {
-    setBoard(Array(10).fill(null).map(() => Array(10).fill(0)));
+    setBoard(Array(8).fill(null).map(() => Array(8).fill(0)));
     setScore(0);
     setAvailableBlocks(generateBlocks());
     setGameOver(false);
