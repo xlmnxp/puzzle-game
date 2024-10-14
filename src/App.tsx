@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Grid, Crown, RotateCcw, Info } from 'lucide-react';
+import { Grid, Crown, RotateCcw, Info, X } from 'lucide-react';
 import { DndProvider } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import GameBoard from './components/GameBoard';
 import BlockSelector from './components/BlockSelector';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
+import AdSense from './components/AdSense';
 import { generateBlocks, checkGameOver, canPlaceBlock } from './utils/gameLogic';
 import { playPlaceSound, playRemoveSound, playEncouragementSound, playHighScoreSound } from './utils/sounds';
 import { Block } from './types';
@@ -153,6 +154,7 @@ function App() {
           </div>
         </div>
         <PWAInstallPrompt />
+        <AdSense />
       </div>
       {gameOver && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-md">

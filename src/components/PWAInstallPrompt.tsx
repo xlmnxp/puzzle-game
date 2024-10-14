@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 
 const PWAInstallPrompt: React.FC = () => {
   const [showPrompt, setShowPrompt] = useState(false);
@@ -29,17 +30,30 @@ const PWAInstallPrompt: React.FC = () => {
     }
   };
 
+  const handleClose = () => {
+    setShowPrompt(false);
+  };
+
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 bg-blue-100 p-4 rounded-lg shadow-lg flex items-center justify-between">
+    <div className="fixed bottom-24 left-4 right-4 bg-blue-100 p-4 rounded-lg shadow-lg flex items-center justify-between">
       <p className="text-blue-800 font-semibold">قم بتثبيت لعبة المكعبات للحصول على تجربة أفضل!</p>
-      <button
-        onClick={handleInstall}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-      >
-        تثبيت
-      </button>
+      <div className="flex items-center">
+        <button
+          onClick={handleInstall}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors mr-2"
+        >
+          تثبيت
+        </button>
+        <button
+          onClick={handleClose}
+          className="text-blue-800 hover:text-blue-900 transition-colors"
+          aria-label="Close"
+        >
+          <X size={24} />
+        </button>
+      </div>
     </div>
   );
 };
