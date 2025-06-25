@@ -18,7 +18,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ board, placeBlock }) => {
       case 3: return 'bg-green-500';
       case 4: return 'bg-yellow-500';
       case 5: return 'bg-purple-500';
-      default: return 'bg-gray-200';
+      default: return 'bg-gray-200 dark:bg-gray-700';
     }
   };
 
@@ -101,13 +101,13 @@ const Cell: React.FC<CellProps> = ({ cellValue, rowIndex, colIndex, board, place
 
   let backgroundColor = getCellColor(cellValue);
   if (isHighlighted) {
-    backgroundColor = 'bg-gray-400';
+    backgroundColor = 'bg-gray-400 dark:bg-gray-500';
   }
 
   return (
     <div
       ref={drop}
-      className={`aspect-square border ${backgroundColor}`}
+      className={`aspect-square border dark:border-gray-600 ${backgroundColor}`}
     />
   );
 };

@@ -37,18 +37,18 @@ const PWAInstallPrompt: React.FC = () => {
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed bottom-24 left-4 right-4 bg-blue-100 p-4 rounded-lg shadow-lg flex items-center justify-between">
-      <p className="text-blue-800 font-semibold">قم بتثبيت لعبة المكعبات للحصول على تجربة أفضل!</p>
+    <div className="fixed bottom-24 left-4 right-4 bg-blue-100 dark:bg-gray-700 p-4 rounded-lg shadow-lg flex items-center justify-between">
+      <p className="text-blue-800 dark:text-blue-300 font-semibold">قم بتثبيت لعبة المكعبات للحصول على تجربة أفضل!</p>
       <div className="flex items-center">
         <button
           onClick={handleInstall}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors mr-2"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors mr-2"
         >
           تثبيت
         </button>
         <button
           onClick={handleClose}
-          className="text-blue-800 hover:text-blue-900 transition-colors"
+          className="text-blue-800 hover:text-blue-900 dark:text-blue-300 dark:hover:text-blue-200 transition-colors"
           aria-label="Close"
         >
           <X size={24} />

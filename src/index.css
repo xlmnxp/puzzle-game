@@ -9,7 +9,7 @@ body,
 }
 
 body {
-    @apply bg-gray-100 touch-none select-none;
+    @apply bg-gray-100 touch-none select-none dark:bg-gray-900;
     overscroll-behavior: none;
 }
 

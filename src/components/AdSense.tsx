@@ -44,7 +44,7 @@ const AdSense: React.FC = () => {
   }, []);
 
   return (
-    <div ref={adRef} className="fixed bottom-0 left-0 right-0 bg-gray-100 py-2 text-center z-50">
+    <div ref={adRef} className="fixed bottom-0 left-0 right-0 bg-gray-100 dark:bg-gray-800 py-2 text-center z-50">
       <ins
         className="adsbygoogle"
         style={{ display: 'block', width: '100%', height: '90px' }}
