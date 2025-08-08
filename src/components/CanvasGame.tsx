@@ -41,6 +41,9 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [cssSize, setCssSize] = useState<{ width: number; height: number }>({ width: 300, height: 500 });
+  const burstsRef = useRef<Array<{ id: number; x: number; y: number; amount: number; start: number; duration: number }>>([]);
+  const rafRef = useRef<number | null>(null);
+  const drawRef = useRef<() => void>(() => {});
 
   const dragStateRef = useRef<{
     active: boolean;
@@ -202,6 +205,76 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
     }
   };
 
+  // Always keep latest draw in a ref for RAF to avoid stale closures
+  useEffect(() => {
+    drawRef.current = draw;
+  });
+
+  const drawBursts = (nowMs: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const active: typeof burstsRef.current = [];
+    for (const b of burstsRef.current) {
+      const t = Math.min(1, (nowMs - b.start) / b.duration);
+      const eased = 1 - Math.pow(1 - t, 2);
+      const y = b.y - 24 * eased;
+      const opacity = 1 - t;
+      if (t < 1) active.push(b);
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, opacity);
+      ctx.fillStyle = '#16a34a'; // green-600
+      ctx.font = 'bold 22px system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.shadowColor = 'rgba(255,255,255,0.9)';
+      ctx.shadowBlur = 2;
+      ctx.fillText(`+${b.amount}`, b.x, y);
+      ctx.restore();
+    }
+    burstsRef.current = active;
+  };
+
+  const ensureAnimation = () => {
+    if (rafRef.current != null) return;
+    const tick = () => {
+      rafRef.current = null;
+      // Use latest draw function to reflect freshest board/props
+      drawRef.current();
+      drawBursts(performance.now());
+      if (burstsRef.current.length > 0 || dragStateRef.current.active) {
+        rafRef.current = requestAnimationFrame(tick);
+      }
+    };
+    rafRef.current = requestAnimationFrame(tick);
+  };
+
+  const spawnBurstForPlacement = (block: Block, row: number, col: number) => {
+    const { cellSize, boardX, boardY } = getLayout();
+    let sumX = 0;
+    let sumY = 0;
+    let count = 0;
+    for (let i = 0; i < block.shape.length; i++) {
+      for (let j = 0; j < block.shape[i].length; j++) {
+        if (block.shape[i][j]) {
+          const cx = boardX + (col + j + 0.5) * cellSize;
+          const cy = boardY + (row + i + 0.5) * cellSize;
+          sumX += cx;
+          sumY += cy;
+          count++;
+        }
+      }
+    }
+    if (count === 0) return;
+    const x = sumX / count;
+    const y = sumY / count;
+    const amount = block.shape.flat().filter(Boolean).length;
+    const id = Date.now() + Math.floor(Math.random() * 1000);
+    burstsRef.current = [...burstsRef.current, { id, x, y, amount, start: performance.now(), duration: 900 }];
+    ensureAnimation();
+  };
+
   const drawRoundedRect = (
     ctx: CanvasRenderingContext2D,
     x: number,
@@ -327,11 +400,12 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
         const dragY = drag.pointer.y - drag.offset.y;
         const cell = getTopLeftCellFromPoint(dragX, dragY);
         if (cell && canPlaceBlock(board, drag.block, cell.row, cell.col)) {
+          spawnBurstForPlacement(drag.block, cell.row, cell.col);
           placeBlock(drag.block, cell.row, cell.col);
         }
       }
       dragStateRef.current = { active: false, block: null, source: null, pointer: { x: 0, y: 0 }, offset: { x: 0, y: 0 }, hoverTopLeftCell: null };
-      draw();
+      ensureAnimation();
     };
 
     canvas.addEventListener('pointerdown', onPointerDown);

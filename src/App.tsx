@@ -17,6 +17,7 @@ function App() {
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [showInstructions, setShowInstructions] = useState<boolean>(false);
   const [showResetConfirmation, setShowResetConfirmation] = useState<boolean>(false);
+  const [scoreBursts, setScoreBursts] = useState<Array<{ id: number; amount: number }>>([]);
   const highScorePlayedRef = useRef<boolean>(false);
 
   useEffect(() => {
@@ -38,6 +39,16 @@ function App() {
     }
   }, [score, highestScore]);
 
+  const addScore = (delta: number) => {
+    if (!delta) return;
+    setScore(prev => prev + delta);
+    const id = Date.now() + Math.floor(Math.random() * 1000);
+    setScoreBursts(prev => [...prev, { id, amount: delta }]);
+    window.setTimeout(() => {
+      setScoreBursts(prev => prev.filter(b => b.id !== id));
+    }, 900);
+  };
+
   const placeBlock = (block: Block, rowIndex: number, colIndex: number) => {
     if (gameOver) return;
 
@@ -56,7 +67,8 @@ function App() {
       }
 
       setBoard(newBoard);
-      setScore(prevScore => prevScore + block.shape.flat().filter(Boolean).length);
+      const placedCells = block.shape.flat().filter(Boolean).length;
+      addScore(placedCells);
       setAvailableBlocks(prevBlocks => {
         const updatedBlocks = prevBlocks.filter(b => b.id !== block.id);
         return updatedBlocks.concat(generateBlocks(1));
@@ -79,7 +91,7 @@ function App() {
 
         setBoard(newBoard);
         const clearedCells = (completedRows.length * BOARD_COLS) + (completedCols.length * BOARD_ROWS) - (completedRows.length * completedCols.length);
-        setScore(prevScore => prevScore + clearedCells);
+        addScore(clearedCells);
       }
 
       let updatedAvailableBlocks = availableBlocks.filter(b => b.id !== block.id);
@@ -116,9 +128,21 @@ function App() {
         <div className="p-2 sm:p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
-              <div className="flex items-center ml-1">
+              <div className="relative flex items-center ml-1">
                 <Grid className="w-4 h-4 ml-1 text-blue-500" />
                 <span className="text-sm font-semibold">النقاط: {score}</span>
+                {scoreBursts.map((b, idx) => (
+                  <span
+                    key={b.id}
+                    className="absolute right-0 -top-3 text-base sm:text-lg font-extrabold text-green-600 animate-points-burst select-none"
+                    style={{
+                      transformOrigin: 'bottom right',
+                      marginTop: `${idx * 2}px`,
+                    }}
+                  >
+                    +{b.amount}
+                  </span>
+                ))}
               </div>
               <div className="flex items-center">
                 <Crown className="w-4 h-4 ml-1 text-yellow-500" />
