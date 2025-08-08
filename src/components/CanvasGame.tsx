@@ -58,6 +58,22 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
     pointerType: string | null;
   }>({ active: false, block: null, source: null, pointer: { x: 0, y: 0 }, offset: { x: 0, y: 0 }, hoverTopLeftCell: null, pointerType: null });
 
+  // Smoothed display position for dragged block (top-left in pixels)
+  const dragDisplayRef = useRef<Point>({ x: 0, y: 0 });
+
+  // Placement animation state
+  const placementAnimRef = useRef<
+    | {
+        block: Block;
+        from: Point; // pixel top-left
+        to: { row: number; col: number };
+        toPixel: Point; // pixel top-left of target cell
+        start: number;
+        duration: number;
+      }
+    | null
+  >(null);
+
   // Resize observer to fit container width
   useEffect(() => {
     const handleResize = () => {
@@ -174,6 +190,7 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
     // Draw palette per-block backgrounds
     const palette = computePaletteLayout();
     const drag = dragStateRef.current;
+    const placing = placementAnimRef.current;
     for (const item of palette) {
       const pad = Math.max(4, Math.round(item.cellSize * 0.2));
       drawRoundedRect(
@@ -184,29 +201,53 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
         item.height + pad * 2,
         8
       );
-      // Hide the block from the palette while it is being dragged
+      // Hide the block from the palette while it is being dragged or animating placement
       const isDraggingThisBlock = drag.active && drag.block && drag.block.id === item.block.id;
-      if (!isDraggingThisBlock) {
+      const isAnimatingThisBlock = !!(placing && placing.block.id === item.block.id);
+      if (!isDraggingThisBlock && !isAnimatingThisBlock) {
         drawBlock(ctx, item.block, item.x, item.y, item.cellSize, 1, 0.8);
       }
     }
 
-    // Draw dragging block and highlight
-    if (drag.active && drag.block) {
+    // Placement animation rendering
+    if (placing) {
+      const t = Math.min(1, (performance.now() - placing.start) / placing.duration);
+      const eased = easeOutCubic(t);
+      const currX = placing.from.x + (placing.toPixel.x - placing.from.x) * eased;
+      const currY = placing.from.y + (placing.toPixel.y - placing.from.y) * eased;
+      const scale = 1.06 - 0.06 * eased;
+      drawBlockWithScale(ctx, placing.block, currX, currY, cellSize, 1, 1, scale);
+
+      // Finish animation -> actually place the block and spawn burst
+      if (t >= 1) {
+        placeBlock(placing.block, placing.to.row, placing.to.col);
+        spawnBurstForPlacement(placing.block, placing.to.row, placing.to.col);
+        placementAnimRef.current = null;
+      }
+    }
+
+    // Draw dragging block and highlight using smoothed position (when not placing)
+    if (!placing && drag.active && drag.block) {
       const dragShiftY = drag.pointerType === 'touch' ? DRAG_VERTICAL_OFFSET_CELLS * cellSize : 0;
-      const dragX = drag.pointer.x - drag.offset.x;
-      const dragY = drag.pointer.y - drag.offset.y - dragShiftY;
+      const desiredX = drag.pointer.x - drag.offset.x;
+      const desiredY = drag.pointer.y - drag.offset.y - dragShiftY;
+
+      // Smooth interpolation towards desired
+      const curr = dragDisplayRef.current;
+      const smooth = 0.35; // smoothing factor
+      curr.x = curr.x + (desiredX - curr.x) * smooth;
+      curr.y = curr.y + (desiredY - curr.y) * smooth;
 
       // Highlight placement if over board
-      const topLeftCell = getTopLeftCellFromPoint(dragX, dragY);
+      const topLeftCell = getTopLeftCellFromPoint(curr.x, curr.y);
       drag.hoverTopLeftCell = topLeftCell;
       if (topLeftCell) {
         const canPlace = canPlaceBlock(board, drag.block, topLeftCell.row, topLeftCell.col);
         drawPlacementHighlight(ctx, drag.block, topLeftCell.row, topLeftCell.col, canPlace);
       }
 
-      // Draw block following pointer
-      drawBlock(ctx, drag.block, dragX, dragY, cellSize, 1, 0.95);
+      // Draw block following (smoothed) pointer with slight scale
+      drawBlockWithScale(ctx, drag.block, curr.x, curr.y, cellSize, 1, 0.97, 1.04);
     }
   };
 
@@ -248,7 +289,7 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
       // Use latest draw function to reflect freshest board/props
       drawRef.current();
       drawBursts(performance.now());
-      if (burstsRef.current.length > 0 || dragStateRef.current.active) {
+      if (burstsRef.current.length > 0 || dragStateRef.current.active || placementAnimRef.current) {
         rafRef.current = requestAnimationFrame(tick);
       }
     };
@@ -327,6 +368,32 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
     ctx.restore();
   };
 
+  const drawBlockWithScale = (
+    ctx: CanvasRenderingContext2D,
+    block: Block,
+    x: number,
+    y: number,
+    cell: number,
+    gap: number,
+    opacity = 1,
+    scale = 1
+  ) => {
+    ctx.save();
+    ctx.globalAlpha = opacity;
+    // Determine block bounds (3x3 max)
+    const width = block.shape[0].length * cell;
+    const height = block.shape.length * cell;
+    const cx = x + width / 2;
+    const cy = y + height / 2;
+    ctx.translate(cx, cy);
+    ctx.scale(scale, scale);
+    ctx.translate(-cx, -cy);
+    drawBlock(ctx, block, x, y, cell, gap, 1);
+    ctx.restore();
+  };
+
+  const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
   const drawPlacementHighlight = (
     ctx: CanvasRenderingContext2D,
     block: Block,
@@ -386,8 +453,11 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
           dragStateRef.current.offset = { x: p.x - blockTopLeftX, y: p.y - blockTopLeftY };
           dragStateRef.current.hoverTopLeftCell = null;
           dragStateRef.current.pointerType = evt.pointerType || null;
+          // Initialize smoothed display position to current
+          dragDisplayRef.current = { x: blockTopLeftX, y: blockTopLeftY };
           draw();
           canvas.setPointerCapture(evt.pointerId);
+          ensureAnimation();
           break;
         }
       }
@@ -402,14 +472,20 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
     const onPointerUp = () => {
       const drag = dragStateRef.current;
       if (drag.active && drag.block) {
-        const { cellSize } = getLayout();
-        const dragShiftY = drag.pointerType === 'touch' ? DRAG_VERTICAL_OFFSET_CELLS * cellSize : 0;
-        const dragX = drag.pointer.x - drag.offset.x;
-        const dragY = drag.pointer.y - drag.offset.y - dragShiftY;
-        const cell = getTopLeftCellFromPoint(dragX, dragY);
+        const { cellSize, boardX, boardY } = getLayout();
+        const curr = dragDisplayRef.current;
+        const cell = getTopLeftCellFromPoint(curr.x, curr.y);
         if (cell && canPlaceBlock(board, drag.block, cell.row, cell.col)) {
-          spawnBurstForPlacement(drag.block, cell.row, cell.col);
-          placeBlock(drag.block, cell.row, cell.col);
+          const toPixel = { x: boardX + cell.col * cellSize, y: boardY + cell.row * cellSize };
+          placementAnimRef.current = {
+            block: drag.block,
+            from: { x: curr.x, y: curr.y },
+            to: { row: cell.row, col: cell.col },
+            toPixel,
+            start: performance.now(),
+            duration: 180,
+          };
+          ensureAnimation();
         }
       }
       dragStateRef.current = { active: false, block: null, source: null, pointer: { x: 0, y: 0 }, offset: { x: 0, y: 0 }, hoverTopLeftCell: null, pointerType: null };
