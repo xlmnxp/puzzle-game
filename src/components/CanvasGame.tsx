@@ -20,6 +20,9 @@ type PaletteItemLayout = {
   height: number;
 };
 
+// On touch devices, keep the dragged block above the finger by this many cells
+const DRAG_VERTICAL_OFFSET_CELLS = 3;
+
 const getColor = (value: number): string => {
   switch (value) {
     case 1:
@@ -52,7 +55,8 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
     pointer: Point;
     offset: Point; // pointer offset from block top-left
     hoverTopLeftCell: { row: number; col: number } | null;
-  }>({ active: false, block: null, source: null, pointer: { x: 0, y: 0 }, offset: { x: 0, y: 0 }, hoverTopLeftCell: null });
+    pointerType: string | null;
+  }>({ active: false, block: null, source: null, pointer: { x: 0, y: 0 }, offset: { x: 0, y: 0 }, hoverTopLeftCell: null, pointerType: null });
 
   // Resize observer to fit container width
   useEffect(() => {
@@ -189,8 +193,9 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
 
     // Draw dragging block and highlight
     if (drag.active && drag.block) {
+      const dragShiftY = drag.pointerType === 'touch' ? DRAG_VERTICAL_OFFSET_CELLS * cellSize : 0;
       const dragX = drag.pointer.x - drag.offset.x;
-      const dragY = drag.pointer.y - drag.offset.y;
+      const dragY = drag.pointer.y - drag.offset.y - dragShiftY;
 
       // Highlight placement if over board
       const topLeftCell = getTopLeftCellFromPoint(dragX, dragY);
@@ -380,6 +385,7 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
           dragStateRef.current.pointer = p;
           dragStateRef.current.offset = { x: p.x - blockTopLeftX, y: p.y - blockTopLeftY };
           dragStateRef.current.hoverTopLeftCell = null;
+          dragStateRef.current.pointerType = evt.pointerType || null;
           draw();
           canvas.setPointerCapture(evt.pointerId);
           break;
@@ -396,15 +402,17 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
     const onPointerUp = () => {
       const drag = dragStateRef.current;
       if (drag.active && drag.block) {
+        const { cellSize } = getLayout();
+        const dragShiftY = drag.pointerType === 'touch' ? DRAG_VERTICAL_OFFSET_CELLS * cellSize : 0;
         const dragX = drag.pointer.x - drag.offset.x;
-        const dragY = drag.pointer.y - drag.offset.y;
+        const dragY = drag.pointer.y - drag.offset.y - dragShiftY;
         const cell = getTopLeftCellFromPoint(dragX, dragY);
         if (cell && canPlaceBlock(board, drag.block, cell.row, cell.col)) {
           spawnBurstForPlacement(drag.block, cell.row, cell.col);
           placeBlock(drag.block, cell.row, cell.col);
         }
       }
-      dragStateRef.current = { active: false, block: null, source: null, pointer: { x: 0, y: 0 }, offset: { x: 0, y: 0 }, hoverTopLeftCell: null };
+      dragStateRef.current = { active: false, block: null, source: null, pointer: { x: 0, y: 0 }, offset: { x: 0, y: 0 }, hoverTopLeftCell: null, pointerType: null };
       ensureAnimation();
     };
 
