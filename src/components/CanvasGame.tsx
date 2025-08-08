@@ -130,7 +130,7 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
     ctx.clearRect(0, 0, cssSize.width, cssSize.height);
 
     // Draw board background
-    ctx.fillStyle = '#f3f4f6'; // gray-100
+    ctx.fillStyle = '#2c2c2c1f';
     ctx.fillRect(boardX, boardY, actualBoardSize, actualBoardSize);
 
     // Grid lines
@@ -164,7 +164,7 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
     const palette = computePaletteLayout();
     setPaletteLayout(palette);
     for (const item of palette) {
-      drawBlock(ctx, item.block, item.x, item.y, item.cellSize, 4, 0.8);
+      drawBlock(ctx, item.block, item.x, item.y, item.cellSize, 1, 0.8);
     }
 
     // Draw dragging block and highlight
@@ -182,7 +182,7 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
       }
 
       // Draw block following pointer
-      drawBlock(ctx, drag.block, dragX, dragY, cellSize, 6, 0.95);
+      drawBlock(ctx, drag.block, dragX, dragY, cellSize, 1, 0.95);
     }
   };
 
