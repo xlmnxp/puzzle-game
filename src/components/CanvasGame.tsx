@@ -21,7 +21,7 @@ type PaletteItemLayout = {
 };
 
 // On touch devices, keep the dragged block above the finger by this many cells
-const DRAG_VERTICAL_OFFSET_CELLS = 3;
+const DRAG_VERTICAL_OFFSET_CELLS = 2;
 
 const getColor = (value: number): string => {
   switch (value) {
@@ -232,11 +232,25 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
       const desiredX = drag.pointer.x - drag.offset.x;
       const desiredY = drag.pointer.y - drag.offset.y - dragShiftY;
 
-      // Smooth interpolation towards desired
+      // Smooth interpolation towards desired with touch acceleration
       const curr = dragDisplayRef.current;
-      const smooth = 0.35; // smoothing factor
+      let smooth = 0.35; // base smoothing factor
+      if (drag.pointerType === 'touch') {
+        const dx = desiredX - curr.x;
+        const dy = desiredY - curr.y;
+        const distance = Math.hypot(dx, dy);
+        const near = cellSize * 0.5;
+        const far = Math.hypot(cssSize.width, cssSize.height) * 0.25;
+        const t = Math.max(0, Math.min(1, (distance - near) / Math.max(1, far - near)));
+        const accel = 0.35 + (0.92 - 0.35) * (1 - Math.pow(1 - t, 2)); // easeOut
+        smooth = Math.max(0.2, Math.min(0.92, accel));
+      }
       curr.x = curr.x + (desiredX - curr.x) * smooth;
       curr.y = curr.y + (desiredY - curr.y) * smooth;
+      if (Math.abs(desiredX - curr.x) < 0.1 && Math.abs(desiredY - curr.y) < 0.1) {
+        curr.x = desiredX;
+        curr.y = desiredY;
+      }
 
       // Highlight placement if over board
       const topLeftCell = getTopLeftCellFromPoint(curr.x, curr.y);
