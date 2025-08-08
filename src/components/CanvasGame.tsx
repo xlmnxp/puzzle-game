@@ -166,6 +166,7 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
 
     // Draw palette per-block backgrounds
     const palette = computePaletteLayout();
+    const drag = dragStateRef.current;
     for (const item of palette) {
       const pad = Math.max(4, Math.round(item.cellSize * 0.2));
       drawRoundedRect(
@@ -176,11 +177,14 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
         item.height + pad * 2,
         8
       );
-      drawBlock(ctx, item.block, item.x, item.y, item.cellSize, 1, 0.8);
+      // Hide the block from the palette while it is being dragged
+      const isDraggingThisBlock = drag.active && drag.block && drag.block.id === item.block.id;
+      if (!isDraggingThisBlock) {
+        drawBlock(ctx, item.block, item.x, item.y, item.cellSize, 1, 0.8);
+      }
     }
 
     // Draw dragging block and highlight
-    const drag = dragStateRef.current;
     if (drag.active && drag.block) {
       const dragX = drag.pointer.x - drag.offset.x;
       const dragY = drag.pointer.y - drag.offset.y;
