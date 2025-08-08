@@ -1,10 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Grid, Crown, RotateCcw, Info, X } from 'lucide-react';
-import { DndProvider } from 'react-dnd';
-import { TouchBackend } from 'react-dnd-touch-backend';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import GameBoard from './components/GameBoard';
-import BlockSelector from './components/BlockSelector';
+import { useState, useEffect, useRef } from 'react';
+import { Grid, Crown, RotateCcw, Info } from 'lucide-react';
+import CanvasGame from './components/CanvasGame';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import AdSense from './components/AdSense';
 import { generateBlocks, checkGameOver, canPlaceBlock } from './utils/gameLogic';
@@ -112,50 +108,47 @@ function App() {
     setShowResetConfirmation(true);
   };
 
-  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-
   return (
-    <DndProvider backend={isTouchDevice ? TouchBackend : HTML5Backend}>
-      <div className="flex flex-col items-center min-h-screen">
-        <div className="p-2 w-full max-w-3xl flex-grow">
-          <h1 className="text-3xl font-bold mb-2 text-blue-600 text-center">لعبة المكعبات</h1>
-          <div className="p-2 sm:p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center space-x-2">
-                <div className="flex items-center ml-1">
-                  <Grid className="w-4 h-4 ml-1 text-blue-500" />
-                  <span className="text-sm font-semibold">النقاط: {score}</span>
-                </div>
-                <div className="flex items-center">
-                  <Crown className="w-4 h-4 ml-1 text-yellow-500" />
-                  <span className="text-sm font-semibold">الأفضل: {highestScore}</span>
-                </div>
+    <div className="flex flex-col items-center min-h-screen">
+      <div className="p-2 w-full max-w-3xl flex-grow">
+        <h1 className="text-3xl font-bold mb-2 text-blue-600 text-center">لعبة المكعبات</h1>
+        <div className="p-2 sm:p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center ml-1">
+                <Grid className="w-4 h-4 ml-1 text-blue-500" />
+                <span className="text-sm font-semibold">النقاط: {score}</span>
               </div>
-              <div className="flex items-center space-x-1">
-                <button
-                  onClick={() => setShowInstructions(!showInstructions)}
-                  className="bg-blue-100 text-blue-600 px-2 py-1 rounded-lg hover:bg-blue-200 transition-colors flex items-center text-xs ml-1"
-                >
-                  <Info className="w-4 h-4 ml-1" />
-                  كيف العب؟
-                </button>
-                <button
-                  onClick={handleResetClick}
-                  className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition-colors flex items-center text-xs"
-                >
-                  <RotateCcw className="w-4 h-4 ml-1" />
-                  لعبة جديدة
-                </button>
+              <div className="flex items-center">
+                <Crown className="w-4 h-4 ml-1 text-yellow-500" />
+                <span className="text-sm font-semibold">الأفضل: {highestScore}</span>
               </div>
             </div>
-            {showInstructions && <Instructions />}
-            {!showInstructions && <GameBoard board={board} placeBlock={placeBlock} />}
-            {!showInstructions && <BlockSelector blocks={availableBlocks} />}
+            <div className="flex items-center space-x-1">
+              <button
+                onClick={() => setShowInstructions(!showInstructions)}
+                className="bg-blue-100 text-blue-600 px-2 py-1 rounded-lg hover:bg-blue-200 transition-colors flex items-center text-xs ml-1"
+              >
+                <Info className="w-4 h-4 ml-1" />
+                كيف العب؟
+              </button>
+              <button
+                onClick={handleResetClick}
+                className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition-colors flex items-center text-xs"
+              >
+                <RotateCcw className="w-4 h-4 ml-1" />
+                لعبة جديدة
+              </button>
+            </div>
           </div>
+          {showInstructions && <Instructions />}
+          {!showInstructions && (
+            <CanvasGame board={board} availableBlocks={availableBlocks} placeBlock={placeBlock} />
+          )}
         </div>
-        <PWAInstallPrompt />
-        <AdSense />
       </div>
+      <PWAInstallPrompt />
+      <AdSense />
       {gameOver && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-md">
           <div className="bg-white p-6 rounded-lg shadow-lg text-center">
@@ -193,7 +186,7 @@ function App() {
           </div>
         </div>
       )}
-    </DndProvider>
+    </div>
   );
 }
 
