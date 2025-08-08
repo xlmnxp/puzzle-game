@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Block } from '../types';
 import { canPlaceBlock } from '../utils/gameLogic';
+import { BOARD_ROWS, BOARD_COLS } from '../utils/constants';
 
 interface CanvasGameProps {
   board: number[][];
@@ -40,9 +41,6 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [cssSize, setCssSize] = useState<{ width: number; height: number }>({ width: 300, height: 500 });
-
-  // Local cache for layout; we compute on draw on-demand
-  const [, setPaletteLayout] = useState<PaletteItemLayout[]>([]);
 
   const dragStateRef = useRef<{
     active: boolean;
@@ -91,17 +89,21 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
   const getLayout = () => {
     const padding = 12;
     const boardSize = Math.min(cssSize.width - padding * 2, cssSize.width - padding * 2);
-    const cellSize = Math.floor(boardSize / 8);
-    const actualBoardSize = cellSize * 8;
-    const boardX = Math.floor((cssSize.width - actualBoardSize) / 2);
+    const cellSize = Math.floor(boardSize / Math.max(BOARD_ROWS, BOARD_COLS));
+    const actualBoardWidth = cellSize * BOARD_COLS;
+    const actualBoardHeight = cellSize * BOARD_ROWS;
+    const boardX = Math.floor((cssSize.width - actualBoardWidth) / 2);
     const boardY = padding;
-    const paletteTop = boardY + actualBoardSize + 16;
+    const paletteTop = boardY + actualBoardHeight + 16;
     const paletteCell = Math.max(14, Math.floor(cellSize * 0.65));
-    const paletteGap = Math.floor(padding * 1.5);
+    // Ensure visual margin between per-block backgrounds: gap >= 2*pad + margin
+    const tilePad = Math.max(4, Math.round(paletteCell * 0.2));
+    const tileMargin = Math.max(6, Math.round(paletteCell * 0.2));
+    const paletteGap = 2 * tilePad + tileMargin;
     const paletteTotalWidth = availableBlocks.length * (paletteCell * 3) + (availableBlocks.length - 1) * paletteGap;
     const paletteX = Math.max(padding, Math.floor((cssSize.width - paletteTotalWidth) / 2));
 
-    return { padding, cellSize, boardX, boardY, actualBoardSize, paletteTop, paletteCell, paletteGap, paletteX };
+    return { padding, cellSize, boardX, boardY, actualBoardWidth, actualBoardHeight, paletteTop, paletteCell, paletteGap, paletteX };
   };
 
   const computePaletteLayout = (): PaletteItemLayout[] => {
@@ -124,34 +126,36 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const { cellSize, boardX, boardY, actualBoardSize } = getLayout();
+    const { cellSize, boardX, boardY, actualBoardWidth, actualBoardHeight } = getLayout();
 
     // Clear
     ctx.clearRect(0, 0, cssSize.width, cssSize.height);
 
     // Draw board background
     ctx.fillStyle = '#2c2c2c1f';
-    ctx.fillRect(boardX, boardY, actualBoardSize, actualBoardSize);
+    ctx.fillRect(boardX, boardY, actualBoardWidth, actualBoardHeight);
 
     // Grid lines
-    ctx.strokeStyle = '#e5e7eb';
+    ctx.strokeStyle = '#e5e7ebc2';
     ctx.lineWidth = 1;
-    for (let i = 0; i <= 8; i++) {
+    for (let i = 0; i <= BOARD_COLS; i++) {
       // vertical
       ctx.beginPath();
       ctx.moveTo(boardX + i * cellSize + 0.5, boardY + 0.5);
-      ctx.lineTo(boardX + i * cellSize + 0.5, boardY + actualBoardSize + 0.5);
+      ctx.lineTo(boardX + i * cellSize + 0.5, boardY + actualBoardHeight + 0.5);
       ctx.stroke();
+    }
+    for (let i = 0; i <= BOARD_ROWS; i++) {
       // horizontal
       ctx.beginPath();
       ctx.moveTo(boardX + 0.5, boardY + i * cellSize + 0.5);
-      ctx.lineTo(boardX + actualBoardSize + 0.5, boardY + i * cellSize + 0.5);
+      ctx.lineTo(boardX + actualBoardWidth + 0.5, boardY + i * cellSize + 0.5);
       ctx.stroke();
     }
 
     // Draw existing cells
-    for (let r = 0; r < 8; r++) {
-      for (let c = 0; c < 8; c++) {
+    for (let r = 0; r < BOARD_ROWS; r++) {
+      for (let c = 0; c < BOARD_COLS; c++) {
         const value = board[r][c];
         if (value !== 0) {
           ctx.fillStyle = getColor(value);
@@ -160,10 +164,18 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
       }
     }
 
-    // Draw palette
+    // Draw palette per-block backgrounds
     const palette = computePaletteLayout();
-    setPaletteLayout(palette);
     for (const item of palette) {
+      const pad = Math.max(4, Math.round(item.cellSize * 0.2));
+      drawRoundedRect(
+        ctx,
+        item.x - pad,
+        item.y - pad,
+        item.width + pad * 2,
+        item.height + pad * 2,
+        8
+      );
       drawBlock(ctx, item.block, item.x, item.y, item.cellSize, 1, 0.8);
     }
 
@@ -186,6 +198,31 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
     }
   };
 
+  const drawRoundedRect = (
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    r: number
+  ) => {
+    const radius = Math.min(r, w / 2, h / 2);
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.arcTo(x + w, y, x + w, y + h, radius);
+    ctx.arcTo(x + w, y + h, x, y + h, radius);
+    ctx.arcTo(x, y + h, x, y, radius);
+    ctx.arcTo(x, y, x + w, y, radius);
+    ctx.closePath();
+    ctx.fillStyle = '#f8fafc80'; // slate-50
+    ctx.fill();
+    ctx.strokeStyle = '#e5e7eb1f'; // gray-200
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+  };
+
   const drawBlock = (
     ctx: CanvasRenderingContext2D,
     block: Block,
@@ -199,7 +236,7 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
     ctx.globalAlpha = opacity;
     for (let i = 0; i < block.shape.length; i++) {
       for (let j = 0; j < block.shape[i].length; j++) {
-        if (block.shape[i][j]) {
+        if (block.shape?.[i]?.[j]) {
           ctx.fillStyle = getColor(block.color);
           ctx.fillRect(x + j * cell + gap, y + i * cell + gap, cell - gap * 2, cell - gap * 2);
         }
@@ -232,8 +269,8 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
   };
 
   const getTopLeftCellFromPoint = (x: number, y: number): { row: number; col: number } | null => {
-    const { cellSize, boardX, boardY, actualBoardSize } = getLayout();
-    if (x < boardX || y < boardY || x > boardX + actualBoardSize || y > boardY + actualBoardSize) return null;
+    const { cellSize, boardX, boardY, actualBoardWidth, actualBoardHeight } = getLayout();
+    if (x < boardX || y < boardY || x > boardX + actualBoardWidth || y > boardY + actualBoardHeight) return null;
     const col = Math.floor((x - boardX) / cellSize);
     const row = Math.floor((y - boardY) / cellSize);
     return { row, col };
@@ -255,28 +292,20 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
       // Find first palette block under pointer and check if inside any filled cell
       for (const item of palette) {
         if (p.x >= item.x && p.x <= item.x + item.width && p.y >= item.y && p.y <= item.y + item.height) {
-          // Determine which cell inside the 3x3 grid was clicked to compute offset relative to block top-left
-          const localX = p.x - item.x;
-          const localY = p.y - item.y;
-          // Compute top-left of active block shape relative to 3x3 grid
+          // Start drag anywhere within the 3x3 palette area
           const firstActive = findFirstActiveCell(item.block);
           const blockTopLeftX = item.x + firstActive.col * item.cellSize;
           const blockTopLeftY = item.y + firstActive.row * item.cellSize;
 
-          // Ensure the pointer is on an active cell region to start drag
-          const gridCol = Math.floor(localX / item.cellSize);
-          const gridRow = Math.floor(localY / item.cellSize);
-          if (item.block.shape[gridRow] && item.block.shape[gridRow][gridCol] === 1) {
-            dragStateRef.current.active = true;
-            dragStateRef.current.block = item.block;
-            dragStateRef.current.source = 'palette';
-            dragStateRef.current.pointer = p;
-            dragStateRef.current.offset = { x: p.x - blockTopLeftX, y: p.y - blockTopLeftY };
-            dragStateRef.current.hoverTopLeftCell = null;
-            draw();
-            canvas.setPointerCapture(evt.pointerId);
-            break;
-          }
+          dragStateRef.current.active = true;
+          dragStateRef.current.block = item.block;
+          dragStateRef.current.source = 'palette';
+          dragStateRef.current.pointer = p;
+          dragStateRef.current.offset = { x: p.x - blockTopLeftX, y: p.y - blockTopLeftY };
+          dragStateRef.current.hoverTopLeftCell = null;
+          draw();
+          canvas.setPointerCapture(evt.pointerId);
+          break;
         }
       }
     };

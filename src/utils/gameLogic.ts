@@ -1,4 +1,5 @@
 import { Block } from '../types';
+import { BOARD_ROWS, BOARD_COLS } from './constants';
 
 const blockShapes = [
   [[1]],
@@ -64,8 +65,8 @@ export const canPlaceBlock = (board: number[][], block: Block, rowIndex: number,
 
 export const checkGameOver = (board: number[][], availableBlocks: Block[]): boolean => {
   for (let block of availableBlocks) {
-    for (let i = 0; i <= board.length - block.shape.length; i++) {
-      for (let j = 0; j <= board[0].length - block.shape[0].length; j++) {
+    for (let i = 0; i <= BOARD_ROWS - block.shape.length; i++) {
+      for (let j = 0; j <= BOARD_COLS - block.shape[0].length; j++) {
         if (canPlaceBlock(board, block, i, j)) {
           return false;
         }

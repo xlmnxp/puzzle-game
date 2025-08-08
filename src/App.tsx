@@ -7,9 +7,10 @@ import { generateBlocks, checkGameOver, canPlaceBlock } from './utils/gameLogic'
 import { playPlaceSound, playRemoveSound, playEncouragementSound, playHighScoreSound } from './utils/sounds';
 import { Block } from './types';
 import Instructions from './components/Instructions';
+import { BOARD_ROWS, BOARD_COLS } from './utils/constants';
 
 function App() {
-  const [board, setBoard] = useState<number[][]>(Array(8).fill(null).map(() => Array(8).fill(0)));
+  const [board, setBoard] = useState<number[][]>(Array(BOARD_ROWS).fill(null).map(() => Array(BOARD_COLS).fill(0)));
   const [score, setScore] = useState<number>(0);
   const [highestScore, setHighestScore] = useState<number>(0);
   const [availableBlocks, setAvailableBlocks] = useState<Block[]>([]);
@@ -63,21 +64,21 @@ function App() {
 
       // Check for completed rows and columns
       const completedRows = newBoard.reduce((acc, row, index) => row.every(cell => cell !== 0) ? [...acc, index] : acc, []);
-      const completedCols = Array(8).fill(null).reduce((acc, _, colIndex) => 
+      const completedCols = Array(BOARD_COLS).fill(null).reduce((acc, _, colIndex) =>
         newBoard.every(row => row[colIndex] !== 0) ? [...acc, colIndex] : acc, []);
 
       if (completedRows.length > 0 || completedCols.length > 0) {
         playRemoveSound();
         playEncouragementSound();
 
-        newBoard = newBoard.map((row, rowIndex) => 
-          completedRows.includes(rowIndex) 
-            ? Array(8).fill(0) 
+        newBoard = newBoard.map((row, rowIndex) =>
+          completedRows.includes(rowIndex)
+            ? Array(BOARD_COLS).fill(0)
             : row.map((cell, colIndex) => completedCols.includes(colIndex) ? 0 : cell)
         );
 
         setBoard(newBoard);
-        const clearedCells = (completedRows.length * 8) + (completedCols.length * 8) - (completedRows.length * completedCols.length);
+        const clearedCells = (completedRows.length * BOARD_COLS) + (completedCols.length * BOARD_ROWS) - (completedRows.length * completedCols.length);
         setScore(prevScore => prevScore + clearedCells);
       }
 
@@ -96,7 +97,7 @@ function App() {
   };
 
   const resetGame = () => {
-    setBoard(Array(8).fill(null).map(() => Array(8).fill(0)));
+    setBoard(Array(BOARD_ROWS).fill(null).map(() => Array(BOARD_COLS).fill(0)));
     setScore(0);
     setAvailableBlocks(generateBlocks());
     setGameOver(false);
