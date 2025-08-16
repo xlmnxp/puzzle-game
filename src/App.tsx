@@ -122,9 +122,13 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen">
-      <div className="p-2 w-full max-w-3xl flex-grow">
+    <div className="min-h-screen flex flex-col items-center">
+      {/* Title stays at the top */}
+      <div className="p-2 w-full max-w-3xl">
         <h1 className="text-3xl font-bold mb-2 text-blue-600 text-center">لعبة المكعبات</h1>
+      </div>
+      {/* Rest of the content centered vertically */}
+      <div className="p-2 w-full max-w-3xl flex-1 flex flex-col justify-center">
         <div className="p-2 sm:p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
@@ -168,7 +172,9 @@ function App() {
           </div>
           {showInstructions && <Instructions />}
           {!showInstructions && (
-            <CanvasGame board={board} availableBlocks={availableBlocks} placeBlock={placeBlock} />
+            <div className="w-full flex justify-center">
+              <CanvasGame board={board} availableBlocks={availableBlocks} placeBlock={placeBlock} />
+            </div>
           )}
         </div>
       </div>

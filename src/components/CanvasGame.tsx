@@ -78,8 +78,11 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
   useEffect(() => {
     const handleResize = () => {
       const width = containerRef.current?.clientWidth || 300;
-      // Reserve ~40% of width for palette area height
-      const height = Math.round(width + Math.max(140, width * 0.4));
+      // Base height: square board plus palette area (~40% of width) with a minimum
+      const baseHeight = Math.round(width + Math.max(140, width * 0.4));
+      // Constrain by viewport height for better mobile fit
+      const viewportMax = Math.max(360, (typeof window !== 'undefined' ? window.innerHeight : baseHeight) - 24);
+      const height = Math.min(baseHeight, viewportMax);
       setCssSize({ width, height });
     };
     handleResize();
