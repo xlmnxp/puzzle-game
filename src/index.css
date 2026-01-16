@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.brick-cell {
+    box-shadow: inset 3px 3px 0px rgba(255, 255, 255, 0.4), inset -3px -3px 0px rgba(0, 0, 0, 0.2);
+}
+
 html,
 body,
 #root {
@@ -19,19 +23,21 @@ body {
 
 /* Floating points burst animation */
 @keyframes points-burst {
-  0% {
-    opacity: 0;
-    transform: translateY(8px) scale(0.9);
-  }
-  10% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-16px) scale(1.08);
-  }
+    0% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.9);
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-16px) scale(1.08);
+    }
 }
 
 .animate-points-burst {
-  animation: points-burst 900ms ease-out both;
+    animation: points-burst 900ms ease-out both;
 }

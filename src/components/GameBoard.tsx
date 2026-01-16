@@ -107,7 +107,7 @@ const Cell: React.FC<CellProps> = ({ cellValue, rowIndex, colIndex, board, place
   return (
     <div
       ref={drop}
-      className={`aspect-square border ${backgroundColor}`}
+      className={`aspect-square border ${backgroundColor} ${cellValue !== 0 || isHighlighted ? 'brick-cell' : ''}`}
     />
   );
 };

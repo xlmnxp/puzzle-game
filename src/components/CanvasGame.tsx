@@ -46,7 +46,7 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
   const [cssSize, setCssSize] = useState<{ width: number; height: number }>({ width: 300, height: 500 });
   const burstsRef = useRef<Array<{ id: number; x: number; y: number; amount: number; start: number; duration: number }>>([]);
   const rafRef = useRef<number | null>(null);
-  const drawRef = useRef<() => void>(() => {});
+  const drawRef = useRef<() => void>(() => { });
 
   const dragStateRef = useRef<{
     active: boolean;
@@ -64,13 +64,13 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
   // Placement animation state
   const placementAnimRef = useRef<
     | {
-        block: Block;
-        from: Point; // pixel top-left
-        to: { row: number; col: number };
-        toPixel: Point; // pixel top-left of target cell
-        start: number;
-        duration: number;
-      }
+      block: Block;
+      from: Point; // pixel top-left
+      to: { row: number; col: number };
+      toPixel: Point; // pixel top-left of target cell
+      start: number;
+      duration: number;
+    }
     | null
   >(null);
 
@@ -179,13 +179,35 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
       ctx.stroke();
     }
 
+    // Helper to draw a single cell with "brick" styling (bevels/depth)
+    const drawBrick = (cx: number, cy: number, cw: number, ch: number, color: string) => {
+      // 1. Base fill
+      ctx.fillStyle = color;
+      ctx.fillRect(cx, cy, cw, ch);
+
+      // 2. Inner Highlight (Top & Left) - mimicking inset_2px_2px_rgba(255,255,255,0.4)
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.fillRect(cx, cy, cw, 2); // Top stripe
+      ctx.fillRect(cx, cy, 2, ch); // Left stripe
+
+      // 3. Inner Shadow (Bottom & Right) - mimicking inset_-4px_-4px_rgba(0,0,0,0.15)
+      ctx.fillStyle = 'rgba(0,0,0,0.15)';
+      ctx.fillRect(cx, cy + ch - 4, cw, 4); // Bottom stripe
+      ctx.fillRect(cx + cw - 4, cy, 4, ch); // Right stripe
+    };
+
     // Draw existing cells
     for (let r = 0; r < BOARD_ROWS; r++) {
       for (let c = 0; c < BOARD_COLS; c++) {
         const value = board[r][c];
         if (value !== 0) {
-          ctx.fillStyle = getColor(value);
-          ctx.fillRect(boardX + c * cellSize + 1, boardY + r * cellSize + 1, cellSize - 2, cellSize - 2);
+          drawBrick(
+            boardX + c * cellSize + 1,
+            boardY + r * cellSize + 1,
+            cellSize - 2,
+            cellSize - 2,
+            getColor(value)
+          );
         }
       }
     }
@@ -363,6 +385,28 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
     ctx.restore();
   };
 
+  /* 
+   * NOTE: We need the drawBrick logic here as well. 
+   * Since drawBlock is defined outside the scope where I defined drawBrick above (inside draw),
+   * I should probably move drawBrick to be a component-level helper or define it inside drawBlock too/or just inline the drawing.
+   * To keep it clean, I'll inline the brick drawing logic here for now or better, move drawBrick to component scope.
+   * Given the tool constraints (replace chunk), I'll implement the drawing logic inline here to match the style.
+   */
+  const drawBrickShape = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, color: string) => {
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, w, h);
+
+    // Highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillRect(x, y, w, 2);
+    ctx.fillRect(x, y, 2, h);
+
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.fillRect(x, y + h - 4, w, 4);
+    ctx.fillRect(x + w - 4, y, 4, h);
+  };
+
   const drawBlock = (
     ctx: CanvasRenderingContext2D,
     block: Block,
@@ -377,8 +421,14 @@ const CanvasGame: React.FC<CanvasGameProps> = ({ board, availableBlocks, placeBl
     for (let i = 0; i < block.shape.length; i++) {
       for (let j = 0; j < block.shape[i].length; j++) {
         if (block.shape?.[i]?.[j]) {
-          ctx.fillStyle = getColor(block.color);
-          ctx.fillRect(x + j * cell + gap, y + i * cell + gap, cell - gap * 2, cell - gap * 2);
+          drawBrickShape(
+            ctx,
+            x + j * cell + gap,
+            y + i * cell + gap,
+            cell - gap * 2,
+            cell - gap * 2,
+            getColor(block.color)
+          );
         }
       }
     }

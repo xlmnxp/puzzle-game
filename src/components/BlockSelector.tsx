@@ -57,7 +57,7 @@ const DraggableBlock: React.FC<DraggableBlockProps> = ({ block }) => {
           return (
             <div
               key={cellIndex}
-              className={`w-full h-full ${isActive ? getBlockColor(block.color) : 'bg-transparent'}`}
+              className={`w-full h-full ${isActive ? `${getBlockColor(block.color)} brick-cell` : 'bg-transparent'}`}
             />
           );
         })}
