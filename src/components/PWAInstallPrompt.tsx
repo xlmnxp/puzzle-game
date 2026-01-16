@@ -42,13 +42,13 @@ const PWAInstallPrompt: React.FC = () => {
       <div className="flex items-center">
         <button
           onClick={handleInstall}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors mr-2"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors mr-2 brick-button"
         >
           تثبيت
         </button>
         <button
           onClick={handleClose}
-          className="text-blue-800 hover:text-blue-900 transition-colors"
+          className="text-blue-800 bg-blue-200 p-1 rounded hover:bg-blue-300 transition-colors brick-button"
           aria-label="Close"
         >
           <X size={24} />

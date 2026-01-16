@@ -125,20 +125,20 @@ function App() {
     <div className="min-h-screen flex flex-col items-center">
       {/* Title stays at the top */}
       <div className="p-2 w-full max-w-3xl">
-        <h1 className="text-3xl font-bold mb-2 text-blue-600 text-center">لعبة المكعبات</h1>
+        <h1 className="text-4xl font-extrabold mb-2 text-yellow-400 text-center tracking-wider drop-shadow-md">لعبة المكعبات</h1>
       </div>
       {/* Rest of the content centered vertically */}
       <div className="p-2 w-full max-w-3xl flex-1 flex flex-col justify-center">
         <div className="p-2 sm:p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
-              <div className="relative flex items-center ml-1">
-                <Grid className="w-4 h-4 ml-1 text-blue-500" />
-                <span className="text-sm font-semibold">النقاط: {score}</span>
+              <div className="game-panel relative flex items-center ml-1 px-3 py-1">
+                <Grid className="w-4 h-4 ml-1 text-blue-600" />
+                <span className="text-sm font-bold text-blue-900">النقاط: {score}</span>
                 {scoreBursts.map((b, idx) => (
                   <span
                     key={b.id}
-                    className="absolute right-0 -top-3 text-base sm:text-lg font-extrabold text-green-600 animate-points-burst select-none"
+                    className="absolute right-0 -top-6 text-base sm:text-lg font-extrabold text-green-400 animate-points-burst select-none"
                     style={{
                       transformOrigin: 'bottom right',
                       marginTop: `${idx * 2}px`,
@@ -148,22 +148,22 @@ function App() {
                   </span>
                 ))}
               </div>
-              <div className="flex items-center">
-                <Crown className="w-4 h-4 ml-1 text-yellow-500" />
-                <span className="text-sm font-semibold">الأفضل: {highestScore}</span>
+              <div className="game-panel flex items-center px-3 py-1">
+                <Crown className="w-4 h-4 ml-1 text-yellow-600" />
+                <span className="text-sm font-bold text-yellow-900">الأفضل: {highestScore}</span>
               </div>
             </div>
             <div className="flex items-center space-x-1">
               <button
                 onClick={() => setShowInstructions(!showInstructions)}
-                className="bg-blue-100 text-blue-600 px-2 py-1 rounded-lg hover:bg-blue-200 transition-colors flex items-center text-xs ml-1"
+                className="bg-blue-100 text-blue-600 px-2 py-1 rounded-lg hover:bg-blue-200 transition-colors flex items-center text-xs ml-1 brick-button"
               >
                 <Info className="w-4 h-4 ml-1" />
                 كيف العب؟
               </button>
               <button
                 onClick={handleResetClick}
-                className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition-colors flex items-center text-xs"
+                className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition-colors flex items-center text-xs brick-button"
               >
                 <RotateCcw className="w-4 h-4 ml-1" />
                 لعبة جديدة
@@ -181,13 +181,13 @@ function App() {
       <PWAInstallPrompt />
       <AdSense />
       {gameOver && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-md">
-          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-            <h2 className="text-2xl font-bold text-red-600 mb-3">انتهت اللعبة!</h2>
+        <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="game-panel w-full max-w-sm text-center">
+            <h2 className="text-3xl font-black text-red-500 mb-3 drop-shadow-sm">انتهت اللعبة!</h2>
             <p className="text-xl mb-4">النتيجة النهائية: {score}</p>
             <button
               onClick={resetGame}
-              className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center mx-auto text-lg"
+              className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center mx-auto text-lg brick-button"
             >
               <RotateCcw className="w-5 h-5 ml-2" />
               لعب مرة أخرى
@@ -196,20 +196,20 @@ function App() {
         </div>
       )}
       {showResetConfirmation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-md">
-          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-            <h2 className="text-xl font-bold text-blue-600 mb-3">هل أنت متأكد؟</h2>
-            <p className="text-sm mb-4">هل تريد حقًا بدء لعبة جديدة؟ ستفقد تقدمك الحالي.</p>
+        <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="game-panel w-full max-w-sm text-center">
+            <h2 className="text-xl font-bold text-yellow-600 mb-3">هل أنت متأكد؟</h2>
+            <p className="text-sm mb-4 text-slate-600">هل تريد حقًا بدء لعبة جديدة؟ ستفقد تقدمك الحالي.</p>
             <div className="flex justify-center space-x-2">
               <button
                 onClick={resetGame}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm ml-2"
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm ml-2 brick-button"
               >
                 نعم، ابدأ لعبة جديدة
               </button>
               <button
                 onClick={() => setShowResetConfirmation(false)}
-                className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors text-sm"
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors text-sm brick-button"
               >
                 لا، استمر في اللعبة الحالية
               </button>

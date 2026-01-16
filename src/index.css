@@ -6,6 +6,11 @@
     box-shadow: inset 3px 3px 0px rgba(255, 255, 255, 0.4), inset -3px -3px 0px rgba(0, 0, 0, 0.2);
 }
 
+.brick-button {
+    @apply active:translate-y-0.5 transition-transform duration-75;
+    box-shadow: inset 3px 3px 0px rgba(255, 255, 255, 0.4), inset -3px -3px 0px rgba(0, 0, 0, 0.2);
+}
+
 html,
 body,
 #root {
@@ -15,6 +20,11 @@ body,
 body {
     @apply bg-gray-100 touch-none select-none;
     overscroll-behavior: none;
+}
+
+.game-panel {
+    @apply bg-white border-4 border-gray-200 rounded-xl p-4;
+    box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 1), inset -2px -2px 0px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 #root {
