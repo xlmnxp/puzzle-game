@@ -48,7 +48,7 @@ const PWAInstallPrompt: React.FC = () => {
         </button>
         <button
           onClick={handleClose}
-          className="text-blue-800 bg-blue-200 p-1 rounded hover:bg-blue-300 transition-colors brick-button"
+          className="text-blue-800 bg-blue-200 p-1 rounded hover:bg-blue-300 transition-colors"
           aria-label="Close"
         >
           <X size={24} />
